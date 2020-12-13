@@ -1,0 +1,38 @@
+// This file is BASED ON part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: project01starter/Mux4Way8.hdl
+
+/**
+ * 4-way 8-bit multiplexor:
+ * out = a if sel == 00
+ *       b if sel == 01
+ *       c if sel == 10
+ *       d if sel == 11
+
+ sel[1] sel[0]  out
+ 0	    0		a
+ 0	    1		b
+ 1	    0		c
+ 1	    1		d
+
+ */
+
+CHIP Mux4Way8 {
+    IN a[8], b[8], c[8], d[8], sel[2];
+    OUT out[8];
+
+
+    /* break up sel into digits
+        select from outputs with opposing possible sel[0]
+            now remaining ouputs with have different possible sel[1] to select from
+    */
+
+    PARTS:
+    /* select from a and b */
+    Mux8(a=a, b=b, sel=sel[0], out=selAorB);
+    /* select from c and d */
+    Mux8(a=c, b=d, sel=sel[0], out=selCorD);
+    /* select from chosen a/b and c/d suign sel[1]*/
+    Mux8(a=selAorB, b=selCorD, sel=sel[1], out=out);
+}

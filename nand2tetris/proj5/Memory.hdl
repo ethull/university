@@ -1,0 +1,117 @@
+// This file is BASED ON part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: project05starter/Memory.hdl
+
+/**
+ * The complete address space of the Hack computer's memory,
+ * including RAM and memory-mapped I/O. 
+ * The chip facilitates read and write operations, as follows:
+ *     Read:  out(t) = Memory[address(t)](t)
+ *     Write: if load(t-1) then Memory[address(t-1)](t) = in(t-1)
+ * In words: the chip always outputs the value stored at the memory 
+ * location specified by address. If load==1, the in value is loaded 
+ * into the memory location specified by address. This value becomes 
+ * available through the out output from the next time step onward.
+ * Address space rules:
+ * Only the upper 16K+8K+1 words of the Memory chip are used. 
+ * Access to address>0x6000 is invalid. Access to any address in 
+ * the range 0x4000-0x5FFF results in accessing the screen memory 
+ * map. Access to address 0x6000 results in accessing the keyboard 
+ * memory map. The behavior in these addresses is described in the 
+ * Screen and Keyboard chip specifications given in the book.
+ */
+
+/*
+RAM6K
+    0 - 16383
+    0 - 0011 1111 1111 1111
+    if 14 is 0 output RAM
+    0000 0010 0011
+SCREEN
+    16384 - 24575
+    0100 0000 0000 0000 - 0101 1111 1111 1111
+    if 14 is 1 output screen
+    0100 0101
+KBD
+    24576
+    0110 0000 0000 0000
+    if 13 & 14 is 1 output keyboard
+    0110
+
+output via just selection
+    select between SCEEN and KBD, then select that result and RAM64
+
+    Mux4Way16(a=outRAM1, b=outRAM2, c=outScreen, d=outKBD, sel=address[13..14], out=out);
+
+output via vars and then selection 
+    001: use RAM; 010: use screen; 100: use keyboard
+    if addr[14] == 0 useRAM=1
+        Xor(addr[14], false);
+    if addr[14] == 1 useScreen=1
+        And(addr[14], false);
+    if addr[13] & addr[14] == 1 useKBD=1
+        And(addr[13], addr[14]);
+    if useKBD=1 useScreen=0
+        And(useKBD, useScreen, out=useScreen);
+        Not(useScreen, out=useScreen);
+    
+    DMux4Way(in=false, sel=address[13..14], a=useRAM, b=useRAM, c=useScreen, d=useKeyboard);
+*/
+
+CHIP Memory {
+    IN in[8], load, address[15];
+    OUT out[8];
+
+    PARTS:
+    //select where to write, relative to addr range being addressed
+    DMux4Way(in=load, sel=address[13..14], 
+        a=selRAM0, b=selRAM1, 
+        c=selScreen, d=selKbd);
+    Or(a=selRAM0, b=selRAM1, out=selRAM);
+
+    RAM16K(in[0..7]=in, load=selRAM, address=address[0..13], out[0..7]=ramOut);
+    // A little of this has been done for you by Stephen
+    // Tricky to get the 8-to-16 screen wiring correct
+    Screen(address=address[0..12],
+        in[0]=in[0], in[1]=in[0],
+        in[2]=in[1], in[3]=in[1],
+        in[4]=in[2], in[5]=in[2],
+        in[6]=in[3], in[7]=in[3],
+        in[8]=in[4], in[9]=in[4],
+        in[10]=in[5], in[11]=in[5],
+        in[12]=in[6], in[13]=in[6],
+        in[14]=in[7], in[15]=in[7],
+        out[0]=screenOut0, out[2]=screenOut1,
+        out[4]=screenOut2, out[6]=screenOut3,
+        out[8]=screenOut4, out[10]=screenOut5,
+        out[12]=screenOut6, out[14]=screenOut7,
+        load=selScreen); // you'll have to define a source for loadToScreen
+    //dont write to keyboard
+    Keyboard(out[0..7]=keyboardOut);
+
+    DMux4Way(in=true, sel=address[13..14], a=useRAM1, b=useRAM2, c=useScreen, d=useKeyboard);
+    Or(a=useRAM1, b=useRAM2, out=useRAM);
+    //select RAM/SCREEN/KBD output
+    // It's neat to use a Mux with "one-hot encoding"
+    // to select the 'right' output of three:
+    // 001: use RAM
+    // 010: use screen
+    // 100: use keyboard
+    Mux8Way16(
+        b[0..7]=ramOut,
+        c[0]=screenOut0,
+        c[1]=screenOut1,
+        c[2]=screenOut2,
+        c[3]=screenOut3,
+        c[4]=screenOut4,
+        c[5]=screenOut5,
+        c[6]=screenOut6,
+        c[7]=screenOut7,
+        e[0..7]=keyboardOut,
+        sel[0]=useRAM,             // you'll have to define sources for these
+        sel[1]=useScreen,
+        sel[2]=useKeyboard,
+        out[0..7]=out
+    );
+}

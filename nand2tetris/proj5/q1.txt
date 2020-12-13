@@ -1,0 +1,3 @@
+the cpu
+    needs new input to receive an interrupt that can be forwarded to be PC
+    since the ROM is read only the C instruction cant be directly received

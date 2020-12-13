@@ -1,0 +1,21 @@
+// This file is BASED ON part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: project01starter/01/Not.hdl
+
+/**
+ * Not gate:
+ * out = not in
+
+Not(x) = (x Nand x)
+
+ */
+
+CHIP Not {
+    IN in;
+    OUT out;
+
+    PARTS:
+    // Stephen's solution
+    Nand(a=in, b=in, out=out);
+}

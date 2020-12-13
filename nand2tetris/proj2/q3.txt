@@ -1,0 +1,1 @@
+In software, the ALU can be run multiple times, so after spliting number in two 8 bit numbers, and adding the first two 8 bits, the results carry bit would need to be outputted so that it can be used when adding the last 2 eight bits.

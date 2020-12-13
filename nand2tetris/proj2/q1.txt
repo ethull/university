@@ -1,0 +1,7 @@
+Just use Xor gate implementation
+
+first run: negate x and save to var (a)
+second run: negate y and save to var (b)
+second run: x & b, save to var (c)
+fourth run: y & a, save to var (d)
+fifth run: c | d, output result

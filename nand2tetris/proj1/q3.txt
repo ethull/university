@@ -1,0 +1,1 @@
+yes, an Or8Way gate can only be used to check if a number contains a 1, but an Xor8Way could be used to check for specific conditions, EG if there is an even or odd number of 1s.

@@ -1,0 +1,41 @@
+// This file is BASED ON part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: project01starter/DMux4Way.hdl
+
+/**
+ * 4-way demultiplexor:
+ * {a, b, c, d} = {in, 0, 0, 0} if sel == 00
+ *                {0, in, 0, 0} if sel == 01
+ *                {0, 0, in, 0} if sel == 10
+ *                {0, 0, 0, in} if sel == 11
+
+ notsel0 = ¬sel0 ; notsel1 = ¬sel1
+ a = in n notsel0 n notsel1
+ b = in n notsel0 n sel1
+ c = in n sel0 n notsel1
+ d = in n sel0 n sel1
+
+ sel[1] sel[0]  out
+ 0	    0		a
+ 0	    1		b
+ 1	    0		c
+ 1	    1		d
+
+ */
+
+CHIP DMux4Way {
+	/* can break problem up by looking at a part of sel */
+    IN in, sel[2];
+    OUT a, b, c, d;
+
+    PARTS:
+	/* select output of 0th digit */
+	DMux(in=in, sel=sel[0], a=inAndSelZeroisZero, b=inAndSelZeroisOne);
+
+	/* one gate wont matter as one will be false */
+	/* if sel[0] == 0, then will need to select between a and c, 
+		since a = x0 (00) and b = x0 (10)*/
+	DMux(in=inAndSelZeroisZero, sel=sel[1], a=a,  b=c);
+	DMux(in=inAndSelZeroisOne,  sel=sel[1], a=b,  b=d);
+}

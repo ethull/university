@@ -1,0 +1,70 @@
+// This file is BASED ON part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: project03starter/a/PC.hdl
+
+/**
+ * A 16-bit counter with load and reset control bits.
+ * if      (reset[t] == 1) out[t+1] = 0
+ * else if (load[t] == 1)  out[t+1] = in[t]
+ * else if (inc[t] == 1)   out[t+1] = out[t] + 1  (integer addition)
+ * else                    out[t+1] = out[t]
+
+    Reset: fetch the first instruction PC = 0
+    Next: fetch the next instruction PC++
+    Goto: fetch instruction n
+ */
+
+CHIP PC {
+    IN in[16],load,inc,reset;
+    OUT out[16];
+
+    PARTS:
+    // Something to start you off: you need *two* 8-bit registers
+    //Register(in=nextLow,  out=out[0..7],  out=currentLow,  load=true);
+    //Register(in=nextHigh, out=out[8..15], out=currentHigh, load=true);
+
+    // Handling 'inc' to increment the 16-bit value also gets tricky
+    //And(a=inc, b=lowIsMax, out=incAndLowIsMax);
+
+    //need to inc first since t+1 used in others
+    //find a way to combine carry bit
+    //check if the lower regVal is full
+    And8Way(in=regCurrentLow,out=lowIsMax);
+    //check if increment signal and the lower regVal is full
+    And(a=inc, b=lowIsMax, out=incAndLowIsMax);
+    //increment low
+    Inc8(in=regCurrentLow,out=incOutLow);
+    //increment high (carrybit)
+    Inc8(in=regCurrentHigh,out=incOutHigh);
+        //if carry bit, increment again
+        //Inc8(in=incOutHigh,out=incOutHighCarry);
+    //select from high with/without carrybit
+    Mux8(a=regCurrentHigh,b=incOutHigh,sel=incAndLowIsMax,out=incOutHighFinal);
+    //select if increment has happened at all
+    Mux8(a=regCurrentLow,b=incOutLow,sel=inc,out=incIfLow);
+    Mux8(a=regCurrentHigh,b=incOutHighFinal,sel=inc,out=incIfHigh);
+
+    //select if new value to load
+    Mux8(a=incIfLow,b=in[0..7],sel=load,out=loadIfLow);
+    Mux8(a=incIfHigh,b=in[8..15],sel=load,out=loadIfHigh);
+
+    //select if to reset (set to 00000000)
+    Mux8(a=loadIfLow,b=false,sel=reset,out=resetIfLow);
+    Mux8(a=loadIfHigh,b=false,sel=reset,out=resetIfHigh);
+
+    //load value to register, it wont have changed
+    Register(in=resetIfLow,out=out[0..7],out=regCurrentLow,load=true);
+    Register(in=resetIfHigh,out=out[8..15],out=regCurrentHigh,load=true);
+
+
+    //my attempt at building an 8bit increment (didnt work out)
+    //Register(in=resetIfLow,out=out[0..7],out=regCurrentLow,out[0]=regCurrentLowBit,load=true);
+
+    //Inc8(in=regCurrentLow,out=incOutLow, out[0]=incOutLowBit);
+    //first bit was 1 and stayed 1 after increment, so no bit added or byte is full
+    //And(a=regCurrentLowBit, b=incOutLowBit, out=lowIsMax);
+    //if inc (1 is added) and (lowIsMax hasnt changed) then carry bit is needed
+    //And(a=inc, b=lowIsMax, out=incAndLowIsMax);
+    //Inc8(in=regCurrentHigh,out=incOutHigh);
+}

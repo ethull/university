@@ -1,0 +1,7 @@
+A DMux4way will ouput 4 values and a DMux will output 2 values, since there will be one 1 bit within the four outputs, we can chain them through 2 or gates.
+
+DMux4way -> 0 1 0 0;
+Or(0,1) -> 1; 
+Or(0,0) -> 0;
+
+//not -> nand

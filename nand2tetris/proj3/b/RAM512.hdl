@@ -1,0 +1,38 @@
+// This file is BASED ON part of the materials accompanying the book 
+// "The Elements of Computing Systems" by Nisan and Schocken, 
+// MIT Press. Book site: www.idc.ac.il/tecs
+// File name: project03starter/b/RAM512.hdl
+
+/**
+ * Memory of 512 registers, each 8 bits wide. Out holds the value
+ * stored at the memory location specified by address. If load==1, then 
+ * the in value is loaded into the memory location specified by address 
+ * (the loaded value will be emitted to out from the next time step onward).
+ */
+
+CHIP RAM512 {
+    IN in[8], load, address[9];
+    OUT out[8];
+
+    PARTS:
+    //And(a=address,b=true)
+    /* use the built-in RAM64 chip
+     * Since the built-in version is 16 bits wide, you will need to wire
+     * it up using sub-buses, so that you use only the bottom 8 bits of
+     * RAM64's 'in' and 'out' buses. That should be easy, if you've got
+     * this far. */
+    //address [0..5] ([0..2] [3..5]) passed to RAM64
+    //address [6..8] (last 3 bits) used to select RAM512 chip
+
+    DMux8Way(in=load,sel=address[6..8],a=load0,b=load1,c=load2,d=load3,e=load4,f=load5,g=load6,h=load7);
+    //16 bit RAM64 only matches 0 to 7 of its pins with input, same with output
+    RAM64(in[0..7]=in, load=load0, address=address[0..5], out[0..7]=out0);
+    RAM64(in[0..7]=in, load=load1, address=address[0..5], out[0..7]=out1);
+    RAM64(in[0..7]=in, load=load2, address=address[0..5], out[0..7]=out2);
+    RAM64(in[0..7]=in, load=load3, address=address[0..5], out[0..7]=out3);
+    RAM64(in[0..7]=in, load=load4, address=address[0..5], out[0..7]=out4);
+    RAM64(in[0..7]=in, load=load5, address=address[0..5], out[0..7]=out5);
+    RAM64(in[0..7]=in, load=load6, address=address[0..5], out[0..7]=out6);
+    RAM64(in[0..7]=in, load=load7, address=address[0..5], out[0..7]=out7);
+    Mux8Way8(a=out0,b=out1,c=out2,d=out3,e=out4,f=out5,g=out6,h=out7,sel=address[6..8],out=out);
+}

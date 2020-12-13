@@ -1,0 +1,77 @@
+// This file is BASED ON part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: project02starter/ALU.hdl
+
+/**
+ * The ALU (Arithmetic Logic Unit).
+ * Computes one of the following functions:
+ * x+y, x-y, y-x, 0, 1, -1, x, y, -x, -y, !x, !y,
+ * x+1, y+1, x-1, y-1, x&y, x|y on two 8-bit inputs, 
+ * according to 6 input bits denoted zx,nx,zy,ny,f,no.
+ * In addition, the ALU computes two 1-bit outputs:
+ * if the ALU output == 0, zr is set to 1; otherwise zr is set to 0;
+ * if the ALU output < 0, ng is set to 1; otherwise ng is set to 0.
+ */
+
+// Implementation: the ALU logic manipulates the x and y inputs
+// and operates on the resulting values, as follows:
+// if (zx == 1) set x = 0        // 8-bit constant
+// if (nx == 1) set x = !x       // bitwise not
+// if (zy == 1) set y = 0        // 8-bit constant
+// if (ny == 1) set y = !y       // bitwise not
+// if (f == 1)  set out = x + y  // integer 2's complement addition
+// if (f == 0)  set out = x & y  // bitwise and
+// if (no == 1) set out = !out   // bitwise not
+// if (out == 0) set zr = 1
+// if (out < 0) set ng = 1
+
+CHIP ALU {
+    IN  
+        x[8], y[8],  // 8-bit inputs        
+        zx, // zero the x input?
+        nx, // negate the x input?
+        zy, // zero the y input?
+        ny, // negate the y input?
+        f,  // compute out = x + y (if 1) or x & y (if 0)
+        no; // negate the out output?
+
+    OUT 
+        out[8], // 8-bit output
+        zr, // 1 if (out == 0), 0 otherwise
+        ng; // 1 if (out < 0),  0 otherwise
+
+    PARTS:
+    // process the x input: if zx, if nx
+    Mux8(a=x, b=false, sel=zx, out=xOrZero); //0 or 0 sel 0
+    Not8(in=xOrZero, out=xInverted);
+    Mux8(a=xOrZero, b=xInverted, sel=nx, out=xOperandToUse); //255
+    
+    // process y input: if zy, if ny
+    Mux8(a=y, b=false, sel=zy, out=yOrZero);
+    Not8(in=yOrZero, out=yInverted);
+    Mux8(a=yOrZero, b=yInverted, sel=ny, out=yOperandToUse);
+
+    // And: if (f==0)  set out = x & y
+    And8(a=xOperandToUse, b=yOperandToUse, out=xAndy);
+    // Add: if (f==1)  set out = x + y
+    Add8(a=xOperandToUse, b=yOperandToUse, out=xAddy);
+    // choose between them: pick operand to use
+    Mux8(a=xAndy, b=xAddy, sel=f, out=fOut);
+
+    // if (no==1) set out = !out
+    Not8(in=fOut,out=nFout);
+    // select final output (between out and !out)
+    Mux8(a=fOut,b=nFout,sel=no,out=out,out=mainOut,out[7]=ngBit);
+
+    // set the zero flag: if out=0 then zr=1 else zr=0
+    Or8Way(in=mainOut, out=notZr);
+    // 0 or 0 is 0, so flip to get 1
+    Not(in=notZr, out=zr);
+    
+    // set the negative flag: if out<0 then ng=1 else ng=0
+
+    //if the outputs last bit is 1 its negative, so 1 & 1 = 1
+    And(a=ngBit, b=true, out=ng);
+    //Or(a=ngBit, b=false, out=ng);
+}

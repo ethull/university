@@ -1,0 +1,4 @@
+if f = 0, its an &
+if f = 1, its an +
+
+the 0 (And, &) operation would run faster, as an And operation is less expensive (less nand gates overall) than running digits through multiple adders
