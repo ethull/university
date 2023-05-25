@@ -1,0 +1,2 @@
+#!/bin/bash
+java -cp . SenderMain $1 $2 $3

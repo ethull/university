@@ -1,0 +1,23 @@
+# links
+- https://www.geeksforgeeks.org/set-in-java/
+- https://stackoverflow.com/questions/22668614/java-util-illegalformatconversionexception
+- https://stackoverflow.com/questions/43811495/how-to-use-printf-with-to-ouput-a-value-from-an-enum-java
+- https://www.javatpoint.com/java-string-format
+## concurrency
+- https://stackoverflow.com/questions/33486536/java-concurrency-data-structure
+- https://medium.com/swlh/race-conditions-locks-semaphores-and-deadlocks-a4f783876529
+- https://stackoverflow.com/questions/2332765/what-is-the-difference-between-lock-mutex-and-semaphore
+## semaphores
+- https://stackoverflow.com/questions/62237076/how-to-reduce-permits-in-semaphore-java
+- https://stackoverflow.com/questions/9789073/incrementing-semaphore-permits-in-java
+- https://stackoverflow.com/questions/52247994/java-semaphore-increases-the-number-of-permits-when-i-do-release-more-than-numbe
+- https://docs.oracle.com/javase/1.5.0/docs/api/java/util/concurrent/Semaphore.html#Semaphore%28int%29
+- https://docs.oracle.com/javase/7/docs/api/java/util/concurrent/locks/ReentrantReadWriteLock.html
+- https://stackoverflow.com/questions/17825508/fairness-setting-in-semaphore-class
+- https://www.javatpoint.com/java-semaphore
+- https://www.javatpoint.com/synchronization-in-java
+- https://stackoverflow.com/questions/7140544/message-passing-vs-locking
+## invocation error
+- https://stackoverflow.com/questions/60473079/recompile-with-xlintunchecked-for-detail-error-in-java
+- https://stackoverflow.com/questions/49260043/java-lang-unsupportedoperationexception-interface-cant-be-instantiated-interf
+- https://www.geeksforgeeks.org/constructor-newinstance-method-in-java-with-examples/

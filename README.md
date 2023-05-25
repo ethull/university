@@ -1,2 +1,2 @@
 # university
-university assignments
+- university assignments
